@@ -1,7 +1,160 @@
-what are the scripts
-how to use the scripts
+TODO
+what are the scripts/started
+how to use the scripts/started
   common conventions (parameters, config files, etc)
-  myaccount.yml (quotes) and a link to yaml site for spec
-description of each script
+  myaccount.yml (note about quoting strings)...maybe a link to yaml site
+description of each script/started...just guessed from the filenames mostly :P
+  length of the descriptions should be...???...
 "going further" section w/links to perl and glc beginner dev material
+does this section need it's own license?
+  Should that be in every example script?
+  Is it already?
+
+
+
+INTRO
+This directory contains several functional examples of using
+Games::Lacuna::Client. To use them, you will need to have a working copy of
+perl and cpan installed. See the installation notes in the top-level README.
+
+
+
+FILES (need to write a perl script to sort this alpha)
+  (or a script to just update this section automatically)
+build_plan.yml                    Bulid projections?
+
+my_trades.pl                      #
+
+glyph_prices.pl                   Something to do with glyph trade
+
+build_report.pl                   #
+
+production_detail.pl              resource production stats?
+
+bleeder_report.pl                 #
+
+build_scheduled.pl                #
+
+map                               Starmap database and scripts
+
+map/scan_map.pl                   Scan the starmap for updates
+
+map/import_n19_coverage.pl        Clever N19 mapping for the starmap database
+
+map/merge_bodies.pl               #
+
+map/make_map.pl                   Output a graphical map
+
+map/init_star_map.pl              New starmap database
+
+map/find_alliance_members.pl      Search the starmap database by alliance
+
+map/lib                           Starmap supporting libs
+
+map/lib/LacunaMap                 Starmap interface
+
+map/lib/LacunaMap/DB.pm           Starmap database api
+
+plans_report.pl                   #
+
+fleet.pl                          #
+
+push.pl                           Automate pushes?
+
+governor.pl                       Manage your empire automatically (kinda);
+                                  see also governor.yml
+
+production_report.pl              resource production stats?
+
+throw_party.pl                    Automate parties
+
+push_all.pl                       Automate pushes?
+
+docked_ships.pl                   #
+
+send_scows.pl                     Send scows
+
+wastorama2.pl                     Empire-wide waste management
+
+email_alien_ships.yml             Config for email_alien_ships.pl; see also
+                                  email_alien_ships.pl
+
+wr.pl                             Scheduled waste recycles
+
+email_alien_ships.pl              ; see also email_alien_ships.yml
+
+glyph_report.pl                   #
+
+forward_email.yml                 Config for forward_email.pl
+
+README                            This file
+
+scan_report_summary.pl            #
+
+combine_glyphs.pl                 #
+
+gene_lab.pl                       #
+
+push_glyphs.pl                    #
+
+ships_travelling.pl               #
+
+send_ships.pl                     Coordinated launches
+
+governor.yml                      Governor settings; see also governor.pl
+
+rename_ships.pl                   Maintain unique ship names?
+
+mission.pl                        #
+
+colony_worlds.pl                  Scan your probe net for good colony sites
+
+storage_inventory.pl              Empire-wide detailed storage stats?
+
+stash_it.pl                       Automated stash pushes?
+
+spy_run.pl                        #
+
+bob.pl                            #
+
+theme_park.pl                     #
+
+available_trades.pl               #
+
+capacityplan.pl                   Automated storage upgrades?
+
+myaccount.yml                     Account config for many of the scripts
+
+incoming_ships.pl                 #
+
+glyph_run.pl                      Automated excavators?
+
+build_scheduled.yml               Scheduled building config
+
+launchpad.pl                      #
+
+prod.pl                           #
+
+build_plan.pl                     #
+
+happiness_report.pl               Empire-wide happy stats?
+
+push_plans.pl                     #
+
+forward_email.pl                  Forward in-game messages?; see also
+                                  forward_email.yml
+
+push_ships.pl                     Automated pushes?
+
+
+
+'Learning more/help' resources may go here but probably in the root instead:
+  modern perl and other free and/or high-quality references
+  the understanding's site/at least that blog post about installing glc in
+    windows, which should actually go in this repo's root README in a
+    section for install notes
+  lacuna developers page with the links to forums, api docs, repos, etc
+  #glc on freenode or #lacuna or whatever it was...is that alive yet?
+
+
 
