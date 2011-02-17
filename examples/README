@@ -1,8 +1,9 @@
 TODO
+
 what are the scripts/started
 how to use the scripts/started
   common conventions (parameters, config files, etc)
-  myaccount.yml (note about quoting strings)...maybe a link to yaml site
+  myaccount.yml (note about quoting strings)/started
 description of each script/started...just guessed from the filenames mostly :P
   length of the descriptions should be...???...
 "going further" section w/links to perl and glc beginner dev material
@@ -12,15 +13,32 @@ does this section need it's own license?
 
 
 
+
 INTRO
+
 This directory contains several functional examples of using
 Games::Lacuna::Client. To use them, you will need to have a working copy of
 perl and cpan installed. See the installation notes in the top-level README.
 
+The myaccount.yml file must be updated before you can run the scripts as
+suggested. Open it with a text editor, and relpace "your empire" and "your
+password" with your login information, being sure to leave the quotes around
+them. It is recommended to use your sitter password for scripts. Change the
+server if you want to use an account on a different server. Leave persistent
+sessions at 1 to reduce RPC usage.
+
+Once this is done, you can run many of the examples. Some of the scripts will
+require additional cpan modules or configuration. See the appropriate
+documentation.
 
 
-FILES (need to write a perl script to sort this alpha)
-  (or a script to just update this section automatically)
+
+
+FILES
+(need to write a perl script to sort this alpha)
+(or a script to just update this section automatically)
+(something somewhere probably already does this for pod)
+
 build_plan.yml                    Bulid projections?
 
 my_trades.pl                      #
@@ -148,6 +166,7 @@ push_ships.pl                     Automated pushes?
 
 
 
+
 'Learning more/help' resources may go here but probably in the root instead:
   modern perl and other free and/or high-quality references
   the understanding's site/at least that blog post about installing glc in
@@ -155,6 +174,7 @@ push_ships.pl                     Automated pushes?
     section for install notes
   lacuna developers page with the links to forums, api docs, repos, etc
   #glc on freenode or #lacuna or whatever it was...is that alive yet?
+
 
 
 
