@@ -1,6 +1,6 @@
 ---
 server_uri: 'https://us1.lacunaexpanse.com'
-api_key: ...
-empire_name: ...
-empire_password: ...
+api_key: 'anonymous'
+empire_name: 'empire'
+empire_password: 'password'
 session_persistent: 1
