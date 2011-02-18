@@ -167,11 +167,14 @@ sub update_wr {
   my $produce_water  = $water_c > $water_s+1;
   my $produce_energy = $energy_c > $energy_s+1;
   my $total_s        = $ore_s + $water_s + $energy_s;
-
+  
+  #use Data::Dumper;
+  #die Dumper [$ore_perc, $water_perc, $energy_perc];
+  
   my ($ore, $water, $energy);
   if (not $produce_ore and not $produce_energy and not $produce_water) {
     output("All storage full! Producing equal amounts of resources to keep waste low.");
-    ($ore, $water, $energy) = map {$total_s/3} 1..3;
+    ($ore, $water, $energy) = map {$rec_waste/3} 1..3;
   }
   else {
     if ($water_perc or $energy_perc or $ore_perc) {
