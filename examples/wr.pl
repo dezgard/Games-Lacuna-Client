@@ -71,12 +71,16 @@ my %planets_by_name = map { ($estatus->{planets}->{$_} => $client->body(id => $_
 
 
 my @wrs;
+my @wr_labels;
 foreach my $planet (values %planets_by_name) {
-  my %buildings = %{ $planet->get_buildings->{buildings} };
+  my $response = $planet->get_buildings();
+  my %buildings = %{ $response->{buildings} };
 
   my @waste_ids = grep {$buildings{$_}{name} eq 'Waste Recycling Center'}
                   keys %buildings;
   push @wrs, map  { $client->building(type => 'WasteRecycling', id => $_) } @waste_ids;
+
+  push @wr_labels, 'WR ' . @wr_labels . " ($response->{status}{body}{name})" for @waste_ids;
 }
 
 my @wr_handlers;
@@ -89,7 +93,7 @@ foreach my $iwr (0..$#wrs) {
     $wr_timers[$iwr] = AnyEvent->timer(
       after => $wait_sec,
       cb    => sub {
-        output('Waited for ' . seconds_to_time($wait_sec) . " on WR $iwr");
+        output('Waited for ' . seconds_to_time($wait_sec) . " on $wr_labels[$iwr]");
         $wr_handlers[$iwr]->()
       },
     );
@@ -120,10 +124,10 @@ Need to generate an API key at https://us1.lacunaexpanse.com/apikey
 and create a configuration YAML file that should look like this
 
   ---
-  api_key: the_public_key
-  empire_name: Name of empire
-  empire_password: password of empire
-  server_uri: https://us1.lacunaexpanse.com/
+  api_key: 'the_public_key'
+  empire_name: 'Name of empire'
+  empire_password:' password of empire'
+  server_uri:' https://us1.lacunaexpanse.com/'
 
 END_USAGE
 
@@ -133,7 +137,7 @@ sub update_wr {
   my $wr = shift;
   my $iwr = shift;
 
-  output("checking WR stats for WR $iwr");
+  output("checking WR stats for $wr_labels[$iwr]");
   my $wr_stat = $wr->view;
 
   my $busy_seconds = $wr_stat->{building}{work}{seconds_remaining};
@@ -145,10 +149,14 @@ sub update_wr {
   output("Checking resource stats");
   my $pstatus = $wr_stat->{status}{body} or die "Could not get planet status via \$struct->{status}{body}: " . Dumper($wr_stat);
   my $waste = $pstatus->{waste_stored};
-  
-  if (not $waste or $waste < 100) {
-    my $poll = 5 * MINUTE;
-    output('(virtually) no waste has accumulated, waiting ' . seconds_to_time($poll));
+  if ($waste < (my $min_waste = $pstatus->{waste_capacity} * .1)) {
+    my $poll = $pstatus->{waste_hour} ? ($min_waste - $waste) / $pstatus->{waste_hour} * 60 * MINUTE + 3 : 0;#divide by 0 check
+    if ($TimePerIteration > 0) {
+      $poll = $TimePerIteration if $poll <= 0 || $poll > $TimePerIteration;
+    } else {
+      $poll = 120 * MINUTE if $poll <= 0;
+    }
+    output('Not enough waste has accumulated, waiting ' . seconds_to_time($poll));
     return $poll;
   }
 
