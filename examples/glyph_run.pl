@@ -12,15 +12,18 @@ use Data::Dumper;
 
 my $planet_name;
 my @glyphs;
+my $use_delay = 0;
 
 GetOptions(
     'planet=s' => \$planet_name,
     'glyph=s'  => \@glyphs,
+    'use_delay' => \$use_delay,
 );
 
 usage() if !@glyphs;
 
 my $cfg_file = Games::Lacuna::Client->get_config_file(shift(@ARGV) || 'lacuna.yml');
+sleep((localtime)[2]) if ($use_delay);
 
 my $client = Games::Lacuna::Client->new(
 	cfg_file => $cfg_file,
@@ -38,9 +41,6 @@ if ($planet_name)
     @selected_planets = grep { $_ eq $planet_name } keys %planets;
 }
 
-
-#@selected_planets = ("Gavania 2");
-@glyphs = qw(anthracite);
 my %requestedGlyphs = map { $_ => 1 } @glyphs;
 
 foreach $planet_name (@selected_planets)
@@ -65,6 +65,11 @@ foreach $planet_name (@selected_planets)
     my @ores = grep {
         exists $requestedGlyphs{$_}
     } keys %{$buildingOre->{ore}};
+    if (!@ores)
+    {
+        print "Can't find any of ", (join ',', keys %requestedGlyphs), " on planet '$planet_name'\n";
+        next;
+    }
 
     foreach my $ore (@ores)
     {
