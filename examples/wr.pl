@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl 
 use strict;
 use warnings;
 use 5.010000;
@@ -12,7 +12,9 @@ use AnyEvent;
 
 use constant MINUTE => 60;
 
-our $TimePerIteration = 20;
+our $TimePerIteration = 120;#minutes, default max time of recycle job
+
+$| = 1;#turn off buffering (for pipes/log tail)
 
 my ($water_perc, $energy_perc, $ore_perc) = (0, 0, 0);
 GetOptions(
@@ -87,7 +89,7 @@ foreach my $iwr (0..$#wrs) {
     $wr_timers[$iwr] = AnyEvent->timer(
       after => $wait_sec,
       cb    => sub {
-        output("Waited for $wait_sec on WR $iwr");
+        output('Waited for ' . seconds_to_time($wait_sec) . " on WR $iwr");
         $wr_handlers[$iwr]->()
       },
     );
@@ -112,7 +114,7 @@ sub output {
 sub usage {
   die <<"END_USAGE";
 Usage: $0 myempire.yml
-       --interval MINUTES  (defaults to 20)
+       --interval MINUTES  (defaults to 120)
 
 Need to generate an API key at https://us1.lacunaexpanse.com/apikey
 and create a configuration YAML file that should look like this
@@ -136,7 +138,7 @@ sub update_wr {
 
   my $busy_seconds = $wr_stat->{building}{work}{seconds_remaining};
   if ($busy_seconds) {
-    output("Still busy for $busy_seconds, waiting");
+    output('Still busy for ' . seconds_to_time($busy_seconds) . ', waiting');
     return $busy_seconds+3;
   }
   
@@ -145,14 +147,15 @@ sub update_wr {
   my $waste = $pstatus->{waste_stored};
   
   if (not $waste or $waste < 100) {
-    output("(virtually) no waste has accumulated, waiting");
-    return 5*MINUTE;
+    my $poll = 5 * MINUTE;
+    output('(virtually) no waste has accumulated, waiting ' . seconds_to_time($poll));
+    return $poll;
   }
 
   my $sec_per_waste = $wr_stat->{recycle}{seconds_per_resource};
   die "seconds_per_resource not found" if not $sec_per_waste;
 
-  my $rec_waste = min($waste, $TimePerIteration / $sec_per_waste, $wr_stat->{recycle}{max_recycle});
+  my $rec_waste = min($waste, ($TimePerIteration / $sec_per_waste)x($TimePerIteration > 0), $wr_stat->{recycle}{max_recycle});
 
   # yeah, I know this is a bit verbose.
   my $ore_c    = $pstatus->{ore_capacity};
@@ -203,14 +206,35 @@ sub update_wr {
     }
   }
 
-  #my ($water, $ore, $energy) = map int($rec_waste/3), (1..3);
+  #my ($water, $ore, $energy) = map $rec_waste/3, (1..3);
+  $_ = int $_ for $ore, $water, $energy;
   output("RECYCLING $rec_waste waste to ore=$ore, water=$water, energy=$energy!");
   eval {
-    #warn Dumper $wr->recycle(int($water), int($ore), int($energy), 0);
-    $wr->recycle(int($water), int($ore), int($energy), 0);
+    #warn Dumper $wr->recycle($water, $ore, $energy, 0);
+    $wr->recycle($water, $ore, $energy, 0);
   };
-  output("Recycling failed: $@"), return(1*MINUTE) if $@;
+  output('Retry in ' . seconds_to_time(MINUTE) . ", recycling failed: $@"), return(1*MINUTE) if $@;
  
-  output("Waiting for recycling job to finish");
+  output('Waiting ' . seconds_to_time( int($rec_waste * $sec_per_waste) + 3 ) . ' for recycling job to finish');
   return int($rec_waste*$sec_per_waste)+3;
+}
+
+sub seconds_to_time {
+  my ($seconds) = @_;
+  my @secs = (86400,3600,60,1);
+  my @time;
+  $seconds -= ($time[$_] = int($seconds / $secs[$_])) * $secs[$_] for 0..$#secs;
+  shift @time until $time[0] || @time <= 2;
+  $_ = sprintf '%02u', $_ for @time[1..$#time];
+  return join ':', @time;
+}
+
+sub time_to_seconds {
+  my ($time) = @_;
+  my @secs = (86400,3600,60,1);
+  $time = [split /:/, $time] if (!ref $time);
+  unshift @$time, (0)x(@secs-@$time) if (@$time < @secs);
+  my $seconds = 0;
+  $seconds += $time->[$_] * $secs[$_] for (0..$#secs);
+  return $seconds;
 }
