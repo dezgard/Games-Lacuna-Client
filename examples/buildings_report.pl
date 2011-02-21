@@ -2,12 +2,10 @@
 
 use strict;
 use warnings;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use Number::Format        qw( format_number );
-use List::Util            qw( max );
-use Getopt::Long          qw(GetOptions);
-use Games::Lacuna::Client ();
+#use FindBin;
+#use lib "$FindBin::Bin/../lib";
+use Getopt::Long qw(GetOptions);
+use Games::Lacuna::Client;
 
 my $planet_name;
 
@@ -36,55 +34,27 @@ my $client = Games::Lacuna::Client->new(
 	# debug    => 1,
 );
 
-my @types = qw( food ore water energy waste );
-
 # Load the planets
 my $empire  = $client->empire->get_status->{empire};
 my $planets = $empire->{planets};
 
-#my @planets = ();
 open my $csv, '>', 'buildings.csv';
 print $csv qq^"Planet","Building","Level"\n^;
+
 # Scan each planet
 foreach my $planet_id ( sort keys %$planets ) {
-    my $name = $planets->{$planet_id};
+  my $name = $planets->{$planet_id};
 
-    next if defined $planet_name && $planet_name ne $name;
-
-    # Load planet data
-    my $planet    = $client->body( id => $planet_id );
-    my $result    = $planet->get_buildings;
-    my $buildings = $result->{buildings};
+  next if defined $planet_name && $planet_name ne $name;
+  
+  # Load planet data
+  my $planet    = $client->body( id => $planet_id );
+  my $result    = $planet->get_buildings;
+  my $buildings = $result->{buildings};
     
-    my @build = ();
-    
-   #$build .= qq^"$name",^;
-    
-    for my $building_id ( sort keys %$buildings ) {
-        #push @build, $buildings->{$building_id}
-        #    if $buildings->{$building_id}{pending_build};
-        #push @build, [@{$buildings->{$building_id}}{qw(name level)}];
-        print $csv qq^"$name","$buildings->{$building_id}{name}","$buildings->{$building_id}{level}"\n^;
-    }
-    
-    #push @planets, [$name, \@build];
-    
-    #next if !@build;
-    #
-    #print "$name\n";
-    #print "=" x length $name;
-    #print "\n";
-    #
-    #for my $building (@build) {
-    #    printf "%s: %s\n",
-    #        $building->{name},
-    #        $building->{pending_build}{end};
-    #}
-    #
-    #print "\n";
+  for my $building_id ( sort keys %$buildings ) {
+    print $csv qq^"$name","$buildings->{$building_id}{name}","$buildings->{$building_id}{level}"\n^;
+  }
 }
 
-
-#use Data::Dumper;
-#print Dumper(\@planets) . "\n";
 
